@@ -4,19 +4,7 @@
 
 	org $F000
 
-YPosFromBottom = $80;
-VisiblePlayerLine = $81;
-PlayerAnimationDelay = $82;
-
-PlayerBitmapFlags = $83;
-; PlayerBitmapFlags
-; D0 = 0 -> show climbing bitmap01 / D0 = 1 -> show climbing bitmap02
-; D1 = 0 -> player facing left / D1 = 1 -> player facing right
-; D2 = 0 -> player climbing / D2 = 1 -> player jumping
-; D3 = 0 -> player not attacking / D3 = 1 -> player attacking
-
-PlayerIsFacingRight = #%00000010;
-PlayerIsJumping = #%00000100;
+	include cliff_ninja.h
 
 Start
 	
@@ -47,10 +35,10 @@ Start
 	lda #7
 	sta PlayerAnimationDelay
 
-	; Set the PlayerBitmapFlags
-	; Player is Jumping (D2) and Facing Right (D1)
-	lda #%00000110
-	sta PlayerBitmapFlags
+	; Player starts Jumping and Facing Right
+	lda #1
+	sta PlayerJumping
+	sta PlayerFacingRight
 
 	; Set initial movement for player
 	lda #%11100000
@@ -69,8 +57,7 @@ FrameLoop
 	sta VSYNC
 
 	; Check if player is facing right
-	lda PlayerIsFacingRight
-	and PlayerBitmapFlags
+	lda PlayerFacingRight
 	beq PlayerIsNotFacingRight
 
 	lda #%00001000
@@ -82,45 +69,26 @@ PlayerIsNotFacingRight
 	; Check if player is climbing or jumping
 	; That is, check if player has collided with the cliff
 	lda #%10000000
-	and CXP0FB 
+	and CXP0FB
 	beq NoCollision
 
-	; Unset 'PlayerIsJumping' flag
-	lda #%11111011
-	and PlayerBitmapFlags 
-	sta PlayerBitmapFlags
+	lda #0
 
-	sta HMCLR
+	; Unset 'PlayerJumping' flag
+	sta PlayerJumping
+
+	; Stops player
+	sta HMP0
 
 	; Player Climbing Animation
 	dec PlayerAnimationDelay 
 	bne KeepPlayerBitmap
 	
 	; flip animation flag
-	lda #%00000001
-	and PlayerBitmapFlags
-	beq DontFlip
-	
-	lda #$00
-	sta COLUBK
+	lda #1
+	eor PlayerAnimationBitmap
+	sta PlayerAnimationBitmap	
 
-	lda #%00000001
-	ora PlayerBitmapFlags
-	sta PlayerBitmapFlags
-
-	jmp DoneFlipCheck
-	
-DontFlip
-
-	lda #$F0
-	sta COLUBK
-
-	lda #%11111110
-	and PlayerBitmapFlags
-	sta PlayerBitmapFlags
-
-DoneFlipCheck
-	
 	lda #7
 	sta PlayerAnimationDelay
 
@@ -130,14 +98,17 @@ KeepPlayerBitmap
 	lda #%01000000	
 	bit SWCHA
 	bne SkipMoveLeft
-	
+
+	; Player can only move left if it was facing right before
+	lda PlayerFacingRight
+	beq SkipMoveLeft
+
 	lda #%00100000
 	sta HMP0
 
-	; Unset PlayerIsFacingRight
-	lda #%11111101
-	and PlayerBitmapFlags
-	sta PlayerBitmapFlags
+	; Unset PlayerFacingRight
+	lda #0
+	sta PlayerFacingRight	
 
 SkipMoveLeft
 
@@ -146,12 +117,15 @@ SkipMoveLeft
 	bit SWCHA
 	bne SkipMoveRight
 
+	; Player can only move right if it was facing left before
+	lda PlayerFacingRight
+	bne SkipMoveRight
+
 	lda #%11100000
 	sta HMP0
 
-	lda PlayerIsFacingRight
-	ora PlayerBitmapFlags
-	sta PlayerBitmapFlags
+	lda #1
+	sta PlayerFacingRight
 	
 SkipMoveRight
 
@@ -160,10 +134,8 @@ SkipMoveRight
 NoCollision
 
 	; set 'PlayerIsJumping' flag
-	lda PlayerIsJumping
-	ora PlayerBitmapFlags 
-	sta PlayerBitmapFlags
-
+	lda #1 
+	sta PlayerJumping
 	
 PlayerIsNotJumping	
 	sta CXCLR
@@ -208,19 +180,16 @@ SkipActivatePlayer
 	sta COLUP0
 
 	; Check if player is jumping
-	;lda #%00000100
-	;and PlayerBitmapFlags
-	;beq PlayerIsClimbing	
-
-	;lda jumpingNinja-1,X
-
-	;jmp definePlayerBitmap
+	lda PlayerJumping
+	beq PlayerIsClimbing
+	
+	lda jumpingNinja-1,X
+	jmp definePlayerBitmap
 
 PlayerIsClimbing
 
 	; Check which climbing player bitmap to show
-	lda #00000001
-	and PlayerBitmapFlags
+	lda PlayerAnimationBitmap
 	beq ShowPlayerBitmap02
 
 	lda clibingNinja01-1,X
