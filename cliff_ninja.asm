@@ -10,10 +10,6 @@ Start
 	
 	CLEAN_START
 
-	; Set background color to light blue
-	lda #$9C
-	sta COLUBK
-
 	; Set playfield to be mirrored
 	lda #%00000001
 	sta CTRLPF
@@ -26,6 +22,9 @@ Start
 	lda #$FF
 	sta PF0
 	sta PF1
+
+	lda #190
+	sta CloudsYPos
 
 	; Set Initial Player Y Position from bottom
 	lda #80
@@ -55,6 +54,10 @@ FrameLoop
 	sta TIM64T
 	lda #0
 	sta VSYNC
+
+	; Set background color to light blue
+	lda #$9C
+	sta COLUBK
 
 	; Check if player is facing right
 	lda PlayerFacingRight
@@ -205,6 +208,16 @@ definePlayerBitmap
 	dec VisiblePlayerLine 	;and decrement the line count
 FinishPlayer
 
+
+	cpy CloudsYPos
+	;if not equal, skip this...
+	bne SkipActivateCloud
+	
+	lda #$0E
+	sta COLUBK
+
+SkipActivateCloud
+
 	dey
 	bne ScanlineLoop
 
@@ -218,7 +231,7 @@ OverScanWait
 	dex
 	bne OverScanWait
 
-	jmp  FrameLoop
+	jmp FrameLoop
 
 	; Sprites data
 	include bitmaps.inc

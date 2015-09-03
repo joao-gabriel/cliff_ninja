@@ -46,3 +46,4 @@ jumpingNinja
         .byte #%00110000;$14
         .byte #%00110000;$40
 
+
