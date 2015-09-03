@@ -110,7 +110,7 @@ KeepPlayerBitmap
 	sta HMP0
 
 	; Unset PlayerFacingRight
-	lda #0
+c	lda #0
 	sta PlayerFacingRight	
 
 SkipMoveLeft
@@ -207,16 +207,6 @@ definePlayerBitmap
 	sta GRP0		;put that line as player graphic
 	dec VisiblePlayerLine 	;and decrement the line count
 FinishPlayer
-
-
-	cpy CloudsYPos
-	;if not equal, skip this...
-	bne SkipActivateCloud
-	
-	lda #$0E
-	sta COLUBK
-
-SkipActivateCloud
 
 	dey
 	bne ScanlineLoop
