@@ -1,6 +1,10 @@
 # Cliff Ninja
 Atari 2600 game coded in 6502 Assembly
 
+Screenshot:
+
+![Screenshot](https://raw.githubusercontent.com/joao-gabriel/cliff_ninja/master/screenshot-alpha-0.1.png)
+
 An attempt to make a [Backflip's Ninjump](http://www.backflipstudios.com/games/ninjump/) clone for the Atari 2600.
 
 Why? Because I think it can be done!
