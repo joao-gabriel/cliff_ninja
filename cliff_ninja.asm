@@ -1,10 +1,10 @@
 	processor 6502
-	include vcs.h
-	include macro.h
+	include includes/vcs.h
+	include includes/macro.h
 
 	org $F000
 
-	include cliff_ninja.h
+	include includes/cliff_ninja.h
 
 Start
 	
@@ -17,7 +17,9 @@ Start
 	; Set Cliff color
 	lda #$F4
 	sta COLUPF
-	
+
+	lda #00
+	sta COLUP1	
 	; Set Cliff data
 	lda #$FF
 	sta PF0
@@ -43,6 +45,10 @@ Start
 	lda #%11100000
 	sta HMP0
 
+	; Set initial vertical rock position
+	lda #183
+	sta ObjectFallingYPos
+
 FrameLoop
 
 	lda #2
@@ -54,10 +60,6 @@ FrameLoop
 	sta TIM64T
 	lda #0
 	sta VSYNC
-
-	; Set background color to light blue
-	lda #$9C
-	sta COLUBK
 
 	; Check if player is facing right
 	lda PlayerFacingRight
@@ -110,7 +112,7 @@ KeepPlayerBitmap
 	sta HMP0
 
 	; Unset PlayerFacingRight
-c	lda #0
+	lda #0
 	sta PlayerFacingRight	
 
 SkipMoveLeft
@@ -141,6 +143,20 @@ NoCollision
 	sta PlayerJumping
 	
 PlayerIsNotJumping	
+
+
+	; Set background color to light blue
+	lda #$9C
+	sta COLUBK
+
+	ldx #$1A
+	sta WSYNC
+Position
+	dex 
+	bne Position
+	sta RESP1
+	sta WSYNC
+
 	sta CXCLR
 	sta WSYNC	
 	sta HMOVE
@@ -160,17 +176,29 @@ ScanlineLoop
 	;if not equal, skip this...
 	bne SkipActivatePlayer 
 	;we need to load it with graphic data
-	;otherwise say that this should go on for 16 lines
+	;otherwise say that this should go on for 14 lines
 	lda #14			
 	sta VisiblePlayerLine
 
 SkipActivatePlayer
+
+	;compare Y to the YPosFromBottom
+	cpy ObjectFallingYPos
+	;if not equal, skip this...
+	bne SkipActivateObject 
+	;we need to load it with graphic data
+	;otherwise say that this should go on for 14 lines
+	lda #6			
+	sta VisibleObjectLine
+
+SkipActivateObject
 
 	sta WSYNC
 
 	;set player graphic to all zeros for this line, and then see if
 	lda #0
 	sta GRP0
+	sta GRP1
 
 	;if the VisiblePlayerLine is non zero,
 	;we're drawing it now!
@@ -200,13 +228,29 @@ PlayerIsClimbing
 
 ShowPlayerBitmap02
 
-	lda clibingNinja02-1,X	;otherwise, load the correct line from BigHeadGraphic
-				;section below... it's off by 1 though, since at zero
-				;we stop drawing
+	lda clibingNinja02-1,X	
+				
 definePlayerBitmap
 	sta GRP0		;put that line as player graphic
 	dec VisiblePlayerLine 	;and decrement the line count
 FinishPlayer
+
+
+
+
+	;if the VisibleObjectLine is non zero,
+	;we're drawing it now!
+	ldx VisibleObjectLine	
+
+	;skip the drawing if its zero...
+	beq FinishObject		
+
+	lda rock-1,X
+	sta GRP1		;put that line as player graphic
+	dec VisibleObjectLine 	;and decrement the line count
+FinishObject
+
+
 
 	dey
 	bne ScanlineLoop
@@ -224,7 +268,7 @@ OverScanWait
 	jmp FrameLoop
 
 	; Sprites data
-	include bitmaps.inc
+	include includes/bitmaps.inc
 
 colorNinja
         .byte #$0E;

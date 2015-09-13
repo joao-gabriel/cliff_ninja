@@ -8,5 +8,6 @@ PlayerJumping = $85;
 
 ObjectFallingYPos = $86;
 ObjectFallingBitmap = $88;
+VisibleObjectLine = $89;
 
 CloudsYPos = $87;
