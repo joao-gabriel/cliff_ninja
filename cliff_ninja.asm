@@ -10,6 +10,10 @@ Start
 	
 	CLEAN_START
 
+	; Set background color to light blue
+	lda #$9C
+	sta COLUBK
+
 	; Set playfield to be mirrored
 	lda #%00000001
 	sta CTRLPF
@@ -18,15 +22,10 @@ Start
 	lda #$F4
 	sta COLUPF
 
-	lda #00
-	sta COLUP1	
 	; Set Cliff data
 	lda #$FF
 	sta PF0
 	sta PF1
-
-	lda #190
-	sta CloudsYPos
 
 	; Set Initial Player Y Position from bottom
 	lda #80
@@ -44,10 +43,6 @@ Start
 	; Set initial movement for player
 	lda #%11100000
 	sta HMP0
-
-	; Set initial vertical rock position
-	lda #183
-	sta ObjectFallingYPos
 
 FrameLoop
 
@@ -85,14 +80,20 @@ PlayerIsNotFacingRight
 	; Stops player
 	sta HMP0
 
+  ; Set bitmap player as ClimbingNinja01 as default
+  lda #<climbingNinja01
+  sta PlayerBitmapLocation
+  lda #>climbingNinja01
+  sta PlayerBitmapLocation + 1
+
 	; Player Climbing Animation
 	dec PlayerAnimationDelay 
 	bne KeepPlayerBitmap
-	
-	; flip animation flag
-	lda #1
-	eor PlayerAnimationBitmap
-	sta PlayerAnimationBitmap	
+
+  lda #<climbingNinja02
+  sta PlayerBitmapLocation
+  lda #>climbingNinja02
+  sta PlayerBitmapLocation + 1
 
 	lda #7
 	sta PlayerAnimationDelay
@@ -141,13 +142,8 @@ NoCollision
 	; set 'PlayerIsJumping' flag
 	lda #1 
 	sta PlayerJumping
-	
-PlayerIsNotJumping	
 
-
-	; Set background color to light blue
-	lda #$9C
-	sta COLUBK
+PlayerIsNotJumping
 
 	ldx #$1A
 	sta WSYNC
@@ -171,87 +167,33 @@ WaitForVblankEnd
 
 ScanlineLoop
 
-	;compare Y to the YPosFromBottom
+	sta WSYNC
+
+	lda #0
+	sta GRP0
+
 	cpy YPosFromBottom
-	;if not equal, skip this...
 	bne SkipActivatePlayer 
-	;we need to load it with graphic data
-	;otherwise say that this should go on for 14 lines
 	lda #14			
 	sta VisiblePlayerLine
 
 SkipActivatePlayer
 
-	;compare Y to the YPosFromBottom
-	cpy ObjectFallingYPos
-	;if not equal, skip this...
-	bne SkipActivateObject 
-	;we need to load it with graphic data
-	;otherwise say that this should go on for 14 lines
-	lda #6			
-	sta VisibleObjectLine
+  tya
+  tax
+	ldy VisiblePlayerLine
 
-SkipActivateObject
-
-	sta WSYNC
-
-	;set player graphic to all zeros for this line, and then see if
-	lda #0
-	sta GRP0
-	sta GRP1
-
-	;if the VisiblePlayerLine is non zero,
-	;we're drawing it now!
-	;check the visible player line...
-	ldx VisiblePlayerLine	
-
-	;skip the drawing if its zero...
 	beq FinishPlayer		
-	lda colorNinja-1,X
+	lda colorNinja-1,Y
 	sta COLUP0
 
-	; Check if player is jumping
-	lda PlayerJumping
-	beq PlayerIsClimbing
-	
-	lda jumpingNinja-1,X
-	jmp definePlayerBitmap
-
-PlayerIsClimbing
-
-	; Check which climbing player bitmap to show
-	lda PlayerAnimationBitmap
-	beq ShowPlayerBitmap02
-
-	lda clibingNinja01-1,X
-	jmp definePlayerBitmap
-
-ShowPlayerBitmap02
-
-	lda clibingNinja02-1,X	
-				
-definePlayerBitmap
-	sta GRP0		;put that line as player graphic
-	dec VisiblePlayerLine 	;and decrement the line count
+  lda (PlayerBitmapLocation),Y
+	sta GRP0
+	dec VisiblePlayerLine
 FinishPlayer
 
-
-
-
-	;if the VisibleObjectLine is non zero,
-	;we're drawing it now!
-	ldx VisibleObjectLine	
-
-	;skip the drawing if its zero...
-	beq FinishObject		
-
-	lda rock-1,X
-	sta GRP1		;put that line as player graphic
-	dec VisibleObjectLine 	;and decrement the line count
-FinishObject
-
-
-
+  txa
+  tay
 	dey
 	bne ScanlineLoop
 

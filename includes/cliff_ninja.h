@@ -1,13 +1,10 @@
 
-YPosFromBottom = $80;
-VisiblePlayerLine = $81;
-PlayerAnimationDelay = $82;
-PlayerAnimationBitmap = $83;
-PlayerFacingRight = $84;
-PlayerJumping = $85;
+YPosFromBottom = $80
+VisiblePlayerLine = $81
+PlayerAnimationDelay = $82
+PlayerAnimationBitmap = $83
+PlayerFacingRight = $84
+PlayerJumping = $85
+PlayerBitmapLocation = $86
 
-ObjectFallingYPos = $86;
-ObjectFallingBitmap = $88;
-VisibleObjectLine = $89;
-
-CloudsYPos = $87;
+NextVar = $88

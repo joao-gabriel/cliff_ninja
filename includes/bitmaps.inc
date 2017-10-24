@@ -1,4 +1,4 @@
-clibingNinja01
+climbingNinja01
         .byte #%00000000;$0E
         .byte #%00000000;$0E
         .byte #%00010000;$0E
@@ -14,7 +14,7 @@ clibingNinja01
         .byte #%00110000;$14
         .byte #%00110000;$40
 
-clibingNinja02
+climbingNinja02
         .byte #%00000000;$0E
         .byte #%11000000;$0E
         .byte #%01100000;$0E
