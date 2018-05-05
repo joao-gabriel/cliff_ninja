@@ -44,6 +44,10 @@ Start
 	lda #%11100000
 	sta HMP0
 
+	; Set initial bitmap for player
+	lda #1
+	sta PlayerWhichBitmap
+
 FrameLoop
 
 	lda #2
@@ -80,25 +84,36 @@ PlayerIsNotFacingRight
 	; Stops player
 	sta HMP0
 
-  ; Set bitmap player as ClimbingNinja01 as default
+	; Player Climbing Animation
+	dec PlayerAnimationDelay
+	bne KeepPlayerBitmap
+
+	lda PlayerWhichBitmap
+	eor #1
+	sta PlayerWhichBitmap
+	lda #7
+	sta PlayerAnimationDelay
+
+KeepPlayerBitmap
+
+	; Check which player bitmap should be shown
+	lda PlayerWhichBitmap
+	bne PlayerBitmap2
+
   lda #<climbingNinja01
   sta PlayerBitmapLocation
   lda #>climbingNinja01
   sta PlayerBitmapLocation + 1
+  jmp PlayerBitmapChooseEnd
 
-	; Player Climbing Animation
-	dec PlayerAnimationDelay 
-	bne KeepPlayerBitmap
+PlayerBitmap2
 
   lda #<climbingNinja02
   sta PlayerBitmapLocation
   lda #>climbingNinja02
   sta PlayerBitmapLocation + 1
 
-	lda #7
-	sta PlayerAnimationDelay
-
-KeepPlayerBitmap
+PlayerBitmapChooseEnd
 
 	; Check if user pressed left
 	lda #%01000000	
@@ -145,14 +160,6 @@ NoCollision
 
 PlayerIsNotJumping
 
-	ldx #$1A
-	sta WSYNC
-Position
-	dex 
-	bne Position
-	sta RESP1
-	sta WSYNC
-
 	sta CXCLR
 	sta WSYNC	
 	sta HMOVE
@@ -169,8 +176,11 @@ ScanlineLoop
 
 	sta WSYNC
 
-	lda #0
+	lda PlayerBitmapBuffer
 	sta GRP0
+
+  lda #0
+  sta PlayerBitmapBuffer
 
 	cpy YPosFromBottom
 	bne SkipActivatePlayer 
@@ -188,7 +198,7 @@ SkipActivatePlayer
 	sta COLUP0
 
   lda (PlayerBitmapLocation),Y
-	sta GRP0
+	sta PlayerBitmapBuffer
 	dec VisiblePlayerLine
 FinishPlayer
 
@@ -216,9 +226,9 @@ colorNinja
         .byte #$0E;
         .byte #$0E;
         .byte #$0E;
-        .byte #$0E;
-        .byte #$0E;
         .byte #$00;
+        .byte #$0E;
+        .byte #$0E;
         .byte #$0E;
         .byte #$0E;
         .byte #$0E;
