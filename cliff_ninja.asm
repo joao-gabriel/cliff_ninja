@@ -48,6 +48,12 @@ Start
 	lda #1
 	sta PlayerWhichBitmap
 
+	; Set all score digits to zero
+	lda #<zero
+  sta ScoreDigit0
+  lda #>zero
+  sta ScoreDigit0 + 1
+
 FrameLoop
 
 	lda #2
@@ -168,7 +174,7 @@ WaitForVblankEnd
 	lda INTIM
 	bne WaitForVblankEnd
 
-	ldy #191
+	ldy #184
 	sta WSYNC
 	sta VBLANK
 
@@ -207,6 +213,40 @@ FinishPlayer
 	dey
 	bne ScanlineLoop
 
+	sta WSYNC
+
+	lda #0
+	sta PF0
+	sta PF1
+	sta PF2
+	sta WSYNC
+
+	ldy #4
+
+ScoreScanlineLoop
+
+	lda (ScoreDigit0),Y
+	sta PF0
+
+	sta WSYNC
+
+	dey
+	bne ScoreScanlineLoop
+
+	lda (ScoreDigit0),Y
+	sta PF0
+
+	sta WSYNC
+
+	lda #0
+	sta PF0
+	sta PF2
+
+	sta WSYNC
+
+	lda #$ff
+	sta PF0
+
 	; Overscan
 	lda #2
 	sta WSYNC
@@ -219,7 +259,7 @@ OverScanWait
 
 	jmp FrameLoop
 
-	; Sprites data
+	; Bitmaps data
 	include includes/bitmaps.inc
 
 colorNinja
