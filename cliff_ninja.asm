@@ -5,6 +5,7 @@
 	org $F000
 
 	include includes/cliff_ninja.h
+	include includes/score.asm
 
 Start
 	
@@ -48,11 +49,26 @@ Start
 	lda #1
 	sta PlayerWhichBitmap
 
+	; Start with 2 Lives
+	lda #%01010100
+	sta Lives
+
+	; Zero distance
+	lda #0
+	sta Distance
+
 	; Set all score digits to zero
-	lda #<zero
-  sta ScoreDigit0
-  lda #>zero
-  sta ScoreDigit0 + 1
+	lda #<two
+  sta ScoreDigit0Location
+  sta ScoreDigit1Location
+  sta ScoreDigit2Location
+  sta ScoreDigit3Location
+  lda #>two
+  sta ScoreDigit0Location + 1
+  sta ScoreDigit1Location + 1
+  sta ScoreDigit2Location + 1
+  sta ScoreDigit3Location + 1
+
 
 FrameLoop
 
@@ -65,6 +81,8 @@ FrameLoop
 	sta TIM64T
 	lda #0
 	sta VSYNC
+
+	sta PF2
 
 	; Check if player is facing right
 	lda PlayerFacingRight
@@ -174,7 +192,7 @@ WaitForVblankEnd
 	lda INTIM
 	bne WaitForVblankEnd
 
-	ldy #184
+	ldy #183
 	sta WSYNC
 	sta VBLANK
 
@@ -215,37 +233,7 @@ FinishPlayer
 
 	sta WSYNC
 
-	lda #0
-	sta PF0
-	sta PF1
-	sta PF2
-	sta WSYNC
-
-	ldy #4
-
-ScoreScanlineLoop
-
-	lda (ScoreDigit0),Y
-	sta PF0
-
-	sta WSYNC
-
-	dey
-	bne ScoreScanlineLoop
-
-	lda (ScoreDigit0),Y
-	sta PF0
-
-	sta WSYNC
-
-	lda #0
-	sta PF0
-	sta PF2
-
-	sta WSYNC
-
-	lda #$ff
-	sta PF0
+	jsr ScoreDisplayRoutine
 
 	; Overscan
 	lda #2

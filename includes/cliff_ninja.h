@@ -9,4 +9,13 @@ PlayerBitmapLocation = $86
 PlayerBitmapBuffer = $88
 PlayerWhichBitmap = $89
 
-ScoreDigit0 = $90
+Lives = $8A
+Distance = $8B
+ScoreDigit0Location = $8C
+ScoreDigit1Location = $8E
+ScoreDigit2Location = $90
+ScoreDigit3Location = $92
+ScoreDisplay = $94
+Score = $95
+
+Temp = $96
