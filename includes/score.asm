@@ -1,3 +1,14 @@
+ScoreIncrementRoutine
+
+	sed
+	clc
+	lda Score
+	adc #$01
+	sta Score
+	cld
+
+	rts
+
 ScoreCalculationRoutine
 
 	lda Score
@@ -12,7 +23,7 @@ ScoreCalculationRoutine
 	adc #<zero
 	sta ScoreDigit0Location
 	; Check if increments MSB
-	lda ScoreDigit0Location+1
+	lda #>zero
 	adc #0
 	sta ScoreDigit0Location+1
 
@@ -32,7 +43,7 @@ ScoreCalculationRoutine
 	adc #<zero
 	sta ScoreDigit1Location
 	; Check if increments MSB
-	lda ScoreDigit1Location+1
+	lda #>zero
 	adc #0
 	sta ScoreDigit1Location+1
 	

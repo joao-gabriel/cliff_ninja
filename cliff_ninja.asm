@@ -67,15 +67,6 @@ Start
   sta ScoreDigit1Location + 1
   sta ScoreDigit2Location + 1
 
-	sed
-	clc
-	lda #$0
-	adc #$56
-	sta Score
-	cld
-
-	jsr ScoreCalculationRoutine
-
 FrameLoop
 
 	lda #2
@@ -117,6 +108,8 @@ PlayerIsNotFacingRight
 	; Player Climbing Animation
 	dec PlayerAnimationDelay
 	bne KeepPlayerBitmap
+
+	jsr ScoreIncrementRoutine
 
 	lda PlayerWhichBitmap
 	eor #1
@@ -193,6 +186,8 @@ PlayerIsNotJumping
 	sta CXCLR
 	sta WSYNC	
 	sta HMOVE
+
+	jsr ScoreCalculationRoutine
 
 WaitForVblankEnd
 	lda INTIM
