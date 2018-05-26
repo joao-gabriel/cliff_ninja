@@ -18,4 +18,4 @@ ScoreDigit3Location = $92
 ScoreDisplay = $94
 Score = $95
 
-Temp = $96
+Temp = $97

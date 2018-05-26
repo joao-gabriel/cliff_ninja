@@ -58,17 +58,23 @@ Start
 	sta Distance
 
 	; Set all score digits to zero
-	lda #<two
+	lda #<zero
   sta ScoreDigit0Location
   sta ScoreDigit1Location
   sta ScoreDigit2Location
-  sta ScoreDigit3Location
-  lda #>two
+  lda #>zero
   sta ScoreDigit0Location + 1
   sta ScoreDigit1Location + 1
   sta ScoreDigit2Location + 1
-  sta ScoreDigit3Location + 1
 
+	sed
+	clc
+	lda #$0
+	adc #$56
+	sta Score
+	cld
+
+	jsr ScoreCalculationRoutine
 
 FrameLoop
 
