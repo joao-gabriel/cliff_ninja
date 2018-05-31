@@ -53,9 +53,9 @@ Start
 	lda #%01010100
 	sta Lives
 
-	; Zero distance and Score
+	; Zero Powerup and Score
 	lda #0
-	sta Distance
+	sta Powerup
 	sta Score
 	sta Score + 1
 

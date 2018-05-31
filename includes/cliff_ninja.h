@@ -10,7 +10,7 @@ PlayerBitmapBuffer = $88
 PlayerWhichBitmap = $89
 
 Lives = $8A
-Distance = $8B
+Powerup = $8B
 ScoreDigit0Location = $8C
 ScoreDigit1Location = $8E
 ScoreDigit2Location = $90

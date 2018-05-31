@@ -89,8 +89,8 @@ ScoreScanlineLoop
 
 	sta WSYNC
 
-	lda Lives											; [3] +3
-	sta PF1												; [6] +3
+	lda Lives
+	sta PF1
 
 	lda (ScoreDigit1Location),Y
 	and #$f0
@@ -99,11 +99,11 @@ ScoreScanlineLoop
 	lda (ScoreDigit2Location),Y
 	and #$0f
 	ora Temp
-	sta PF2												; [12] +3
+	sta PF2
 
-	lda (ScoreDigit0Location),Y		; [17] +5*
-	and #$f0											; [19] +2
-	sta PF0												; [22] +3
+	lda (ScoreDigit0Location),Y
+	and #$f0
+	sta PF0
 
 	lda zero,Y
 	and #$f0
@@ -111,7 +111,7 @@ ScoreScanlineLoop
 	sta PF1
 
 	SLEEP 4
-	lda #0												; [37] +2
+	lda #0
 	sta PF1
 	sta PF0
 	sta PF2
