@@ -53,9 +53,11 @@ Start
 	lda #%01010100
 	sta Lives
 
-	; Zero distance
+	; Zero distance and Score
 	lda #0
 	sta Distance
+	sta Score
+	sta Score + 1
 
 	; Set all score digits to zero
 	lda #<zero

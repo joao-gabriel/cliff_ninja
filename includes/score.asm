@@ -5,6 +5,9 @@ ScoreIncrementRoutine
 	lda Score
 	adc #$01
 	sta Score
+	lda Score + 1
+	adc #$00
+	sta Score + 1
 	cld
 
 	rts
@@ -25,7 +28,7 @@ ScoreCalculationRoutine
 	; Check if increments MSB
 	lda #>zero
 	adc #0
-	sta ScoreDigit0Location+1
+	sta ScoreDigit0Location + 1
 
 	lda Score
 	; isolate tens
@@ -45,7 +48,23 @@ ScoreCalculationRoutine
 	; Check if increments MSB
 	lda #>zero
 	adc #0
-	sta ScoreDigit1Location+1
+	sta ScoreDigit1Location + 1
+
+	lda Score + 1
+	; isolate ones
+	and #$0f
+	sta Temp
+	; multiplies it by 5 to find correct bitmap on lookup table
+	clc
+	asl
+	asl
+	adc Temp
+	adc #<zero
+	sta ScoreDigit2Location
+	; Check if increments MSB
+	lda #>zero
+	adc #0
+	sta ScoreDigit2Location + 1
 	
 	rts
 
